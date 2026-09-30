@@ -1,8 +1,8 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
+import axios, { type AxiosError } from "axios"
 
 /** Mirrors the backend's global response envelope (job-app's
- * ResponseEnvelopeInterceptor/Filter) — every response, success or error,
- * arrives in this shape. */
+ * ResponseEnvelopeInterceptor/Filter) — every response that has a body
+ * arrives in this shape. A 204 (DELETE) has no body at all. */
 interface ResponseEnvelope<T> {
   requestSuccessful: boolean
   responseMessage: string
@@ -34,26 +34,37 @@ export function clearToken(): void {
   localStorage.removeItem(TOKEN_STORAGE_KEY)
 }
 
-async function request<T>(path: string, init?: RequestInit): Promise<T> {
-  const token = getToken()
-  const response = await fetch(`${API_BASE_URL}${path}`, {
-    ...init,
-    headers: {
-      "Content-Type": "application/json",
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...init?.headers,
-    },
-  })
+const client = axios.create({ baseURL: import.meta.env.VITE_API_BASE_URL })
 
-  const envelope = (await response.json()) as ResponseEnvelope<T>
-  if (!response.ok || !envelope.requestSuccessful) {
-    throw new ApiError(envelope.responseMessage, response.status)
+client.interceptors.request.use((config) => {
+  const token = getToken()
+  if (token) config.headers.Authorization = `Bearer ${token}`
+  return config
+})
+
+function toApiError(error: AxiosError<ResponseEnvelope<unknown>>): ApiError {
+  if (error.response) {
+    return new ApiError(error.response.data?.responseMessage ?? "Request failed.", error.response.status)
   }
-  return envelope.responseBody
+  return new ApiError("Unable to reach the server.", 0)
+}
+
+async function request<T>(path: string, config?: Parameters<typeof client.request>[0]): Promise<T> {
+  try {
+    const response = await client.request<ResponseEnvelope<T>>({ url: path, ...config })
+    // A 204 (DELETE) has no envelope to unwrap.
+    if (response.status === 204) return undefined as T
+    return response.data.responseBody
+  } catch (error) {
+    if (axios.isAxiosError(error)) throw toApiError(error)
+    throw error
+  }
 }
 
 export const api = {
   get: <T>(path: string) => request<T>(path),
-  post: <T>(path: string, body?: unknown) =>
-    request<T>(path, { method: "POST", body: body ? JSON.stringify(body) : undefined }),
+  post: <T>(path: string, body?: unknown) => request<T>(path, { method: "POST", data: body }),
+  patch: <T>(path: string, body?: unknown) => request<T>(path, { method: "PATCH", data: body }),
+  put: <T>(path: string, body?: unknown) => request<T>(path, { method: "PUT", data: body }),
+  delete: <T = void>(path: string) => request<T>(path, { method: "DELETE" }),
 }

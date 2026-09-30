@@ -1,5 +1,5 @@
 import { useId, useState, type FormEvent } from "react"
-import { Navigate, useLocation } from "react-router-dom"
+import { Link, Navigate, useLocation } from "react-router-dom"
 import { Button } from "@/components/ui/button"
 import { Field, FieldDescription, FieldGroup, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
@@ -44,6 +44,9 @@ export function LoginPage() {
             Sign in
           </h1>
           <p className="text-sm text-muted-foreground">Track and score jobs against your candidate profile.</p>
+          {(location.state as { registered?: boolean } | null)?.registered && (
+            <p className="text-sm text-match">Account created — sign in below.</p>
+          )}
         </div>
         <form onSubmit={handleSubmit} noValidate>
           <FieldGroup>
@@ -85,6 +88,12 @@ export function LoginPage() {
             </Field>
           </FieldGroup>
         </form>
+        <p className="mt-6 text-sm text-muted-foreground">
+          New here?{" "}
+          <Link to="/register" className="text-foreground underline underline-offset-4">
+            Create an account
+          </Link>
+        </p>
       </div>
     </div>
   )
