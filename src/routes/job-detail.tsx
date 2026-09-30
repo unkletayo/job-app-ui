@@ -10,6 +10,7 @@ import { Empty, EmptyDescription, EmptyTitle } from "@/components/ui/empty"
 import { Separator } from "@/components/ui/separator"
 import { Skeleton } from "@/components/ui/skeleton"
 import { ApiError } from "@/lib/api"
+import { HEADING_FONT, META_FONT } from "@/lib/fonts"
 import { getJobPosting } from "@/lib/jobs"
 import type { JobPostingDetail, MatchGap, MatchReason } from "@/lib/types"
 
@@ -81,8 +82,12 @@ function JobDetailContent({ job }: { job: JobPostingDetail }) {
     <div className="flex flex-col gap-8">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <h1 className="text-xl font-semibold text-balance">{job.title}</h1>
-          <p className="text-sm text-muted-foreground">{[job.company, ...job.location].join(" · ")}</p>
+          <h1 className="text-xl font-semibold tracking-tight text-balance" style={{ fontFamily: HEADING_FONT }}>
+            {job.title}
+          </h1>
+          <p className="text-sm tracking-tight text-muted-foreground" style={{ fontFamily: META_FONT }}>
+            {[job.company, ...job.location].join(" · ")}
+          </p>
         </div>
         {job.applicationUrl && (
           <Button render={<a href={job.applicationUrl} target="_blank" rel="noreferrer" />}>
@@ -113,7 +118,7 @@ function JobDetailContent({ job }: { job: JobPostingDetail }) {
           <h2 className="mb-2 text-sm font-medium">Sources</h2>
           <div className="flex flex-wrap gap-2">
             {job.jobCluster.sourcePostings.map((source) => (
-              <Badge key={source.id} variant="outline">
+              <Badge key={source.id} variant="outline" style={{ fontFamily: META_FONT }}>
                 {source.source}
               </Badge>
             ))}
@@ -162,7 +167,11 @@ function ReasonRow({ reason }: { reason: MatchReason }) {
     <li className="rounded-lg border p-3">
       <div className="flex items-start justify-between gap-3">
         <p className="text-sm font-medium text-pretty">{reason.requirement}</p>
-        <Badge variant={reason.confidence === "high" ? "match" : "secondary"} className="shrink-0">
+        <Badge
+          variant={reason.confidence === "high" ? "match" : "secondary"}
+          className="shrink-0"
+          style={{ fontFamily: META_FONT }}
+        >
           {reason.confidence} confidence
         </Badge>
       </div>
@@ -175,7 +184,7 @@ function GapRow({ gap }: { gap: MatchGap }) {
   return (
     <li className="flex items-center justify-between gap-3 rounded-lg border border-dashed p-3">
       <p className="text-sm text-pretty text-muted-foreground">{gap.requirement}</p>
-      <Badge variant="outline" className="shrink-0">
+      <Badge variant="outline" className="shrink-0" style={{ fontFamily: META_FONT }}>
         Gap
       </Badge>
     </li>

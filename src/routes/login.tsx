@@ -5,6 +5,7 @@ import { Field, FieldDescription, FieldGroup, FieldLabel } from "@/components/ui
 import { Input } from "@/components/ui/input"
 import { Spinner } from "@/components/ui/spinner"
 import { ApiError } from "@/lib/api"
+import { HEADING_FONT } from "@/lib/fonts"
 import { useAuth } from "@/lib/use-auth"
 
 export function LoginPage() {
@@ -39,7 +40,9 @@ export function LoginPage() {
     <div className="flex min-h-svh items-center justify-center p-6">
       <div className="w-full max-w-sm">
         <div className="mb-8 flex flex-col gap-1">
-          <h1 className="text-xl font-semibold">Sign in</h1>
+          <h1 className="text-xl font-semibold tracking-tight" style={{ fontFamily: HEADING_FONT }}>
+            Sign in
+          </h1>
           <p className="text-sm text-muted-foreground">Track and score jobs against your candidate profile.</p>
         </div>
         <form onSubmit={handleSubmit} noValidate>

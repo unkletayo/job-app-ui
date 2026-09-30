@@ -55,6 +55,12 @@
       "skillPath": "skills/explain-interface/SKILL.md",
       "computedHash": "c070d4c7d530011d572b18bf86ddff9cd7493942379deca7eb63aae1d99df17c"
     },
+    "find-skills": {
+      "source": "vercel-labs/skills",
+      "sourceType": "github",
+      "skillPath": "skills/find-skills/SKILL.md",
+      "computedHash": "b146008599c31057cef1c145774cea5d5afb30e8f43fa802e47a4b461419aaaf"
+    },
     "interface-review": {
       "source": "jakubkrehel/skills",
       "sourceType": "github",

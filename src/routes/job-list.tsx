@@ -9,6 +9,7 @@ import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/
 import { Skeleton } from "@/components/ui/skeleton"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { ApiError } from "@/lib/api"
+import { HEADING_FONT, META_FONT } from "@/lib/fonts"
 import { listJobs } from "@/lib/jobs"
 import type { JobPostingSummary } from "@/lib/types"
 
@@ -22,7 +23,9 @@ export function JobListPage() {
   return (
     <AppShell>
       <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
-        <h1 className="text-lg font-semibold">Jobs</h1>
+        <h1 className="text-lg font-semibold tracking-tight" style={{ fontFamily: HEADING_FONT }}>
+          Jobs
+        </h1>
         <ToggleGroup
           value={[filter]}
           onValueChange={(value: string[]) => {
@@ -106,25 +109,40 @@ function JobResults({ filter }: { filter: Filter }) {
   return (
     <div className="flex flex-col gap-3">
       {jobs.map((job) => (
-        <Link key={job.id} to={`/jobs/${job.id}`}>
-          <Card className="transition-colors hover:bg-accent/50">
-            <CardHeader>
-              <div className="flex min-w-0 items-center gap-4">
-                <Avatar className="size-10 shrink-0">
-                  <AvatarFallback>{job.company.charAt(0).toUpperCase()}</AvatarFallback>
-                </Avatar>
-                <div className="min-w-0 flex-1">
-                  <CardTitle className="truncate">{job.title}</CardTitle>
-                  <p className="truncate text-sm text-muted-foreground">{[job.company, ...job.location].join(" · ")}</p>
-                </div>
-              </div>
-              <CardAction>
-                <MatchScoreBadge matchScore={job.matchScore} />
-              </CardAction>
-            </CardHeader>
-          </Card>
-        </Link>
+        <JobCard key={job.id} job={job} />
       ))}
     </div>
+  )
+}
+
+function JobCard({ job }: { job: JobPostingSummary }) {
+  return (
+    <Link to={`/jobs/${job.id}`}>
+      <Card className="transition-colors hover:bg-accent/50">
+        <CardHeader>
+          <div className="flex min-w-0 items-center gap-4">
+            <Avatar className="size-10 shrink-0">
+              <AvatarFallback className="rounded-md font-medium" style={{ fontFamily: HEADING_FONT }}>
+                {job.company.charAt(0).toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
+            <div className="min-w-0 flex-1">
+              <CardTitle className="truncate font-semibold tracking-tight" style={{ fontFamily: HEADING_FONT }}>
+                {job.title}
+              </CardTitle>
+              <p
+                className="truncate text-xs tracking-tight text-muted-foreground"
+                style={{ fontFamily: META_FONT }}
+              >
+                {[job.company, ...job.location].join(" · ")}
+              </p>
+            </div>
+          </div>
+          <CardAction>
+            <MatchScoreBadge matchScore={job.matchScore} />
+          </CardAction>
+        </CardHeader>
+      </Card>
+    </Link>
   )
 }
